@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>メギド編成説明画像ジェネレーター Final v2</title>
+    <title>メギド編成説明画像ジェネレーター Final v3</title>
     <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
     <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -11,11 +11,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --rush-color: #B3B3B5;
-            --counter-color: #F36C21;
-            --burst-color: #5BC0DE;
-        }
         body {
             font-family: 'Noto Sans JP', sans-serif;
             font-weight: 700;
@@ -102,7 +97,6 @@
         .checkbox-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; }
         .checkbox-item { display: flex; align-items: center; font-size: 12px; }
 
-        /* --- スマホ対応 (レスポンシブデザイン) --- */
         @media (max-width: 800px) {
             body { height: auto; }
             .main-container { flex-direction: column; }
@@ -117,41 +111,45 @@
 
     <script type="text/babel">
         const { useState, useRef, useEffect, useCallback } = React;
-
         const CANVAS_WIDTH = 1200;
         const CANVAS_HEIGHT = 675;
 
         function FormationCreator() {
-            const MEGIDO_LIST = [ { 名前: 'バエル', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'バエルC', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'アガレス', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'アガレスC', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'ウァサゴ', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'ウァサゴB', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'ガミジン', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'ガミジンB', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'マルバス', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'マルバスR', スタイル: 'ラッシュ', クラス: 'スナイパー' }, { 名前: 'ウァレフォル', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'ウァレフォルC', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'アモン', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'アモンR', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'バルバトス', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'バルバトスR', スタイル: 'ラッシュ', クラス: 'スナイパー' }, { 名前: 'パイモン', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'パイモンB', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'ブエル', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'ブエルR', スタイル: 'ラッシュ', クラス: 'スナイパー' }, { 名前: 'グシオン', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'グシオンB', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'シトリー', スタイル: 'カウンター', クラス: 'トルーパー' }, { 名前: 'シトリーR', スタイル: 'ラッシュ', クラス: 'トルーパー' }, { 名前: 'ベレト', スタイル: 'カウンター', クラス: 'トルーパー' }, { 名前: 'ベレトB', スタイル: 'バースト', クラス: 'トルーパー' }, { 名前: 'レラジェ', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'レラジェR', スタイル: 'ラッシュ', クラス: 'スナイパー' }, { 名前: 'エリゴス', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'エリゴスB', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'ゼパル', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'ゼパルC', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'ボティス', スタイル: 'カウンター', クラス: 'トルーパー' }, { 名前: 'ボティスR', スタイル: 'ラッシュ', クラス: 'トルーパー' }, { 名前: 'バティン', スタイル: 'ラッシュ', クラス: 'トルーパー' }, { 名前: 'バティンB', スタイル: 'バースト', クラス: 'トルーパー' }, { 名前: 'サレオス', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'サレオスC', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'プルソン', スタイル: 'ラッシュ', クラス: 'トルーパー' }, { 名前: 'プルソンB', スタイル: 'バースト', クラス: 'トルーパー' }, { 名前: 'モラクス', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'モラクスR', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'イポス', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'イポスC', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'アイム', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'アイムR', スタイル: 'ラッシュ', クラス: 'スナイパー' }, { 名前: 'ナベリウス', スタイル: 'ラッシュ', クラス: 'トルーパー' }, { 名前: 'ナベリウスB', スタイル: 'バースト', クラス: 'トルーパー' }, { 名前: 'グラシャラボラス', スタイル: 'バースト', クラス: 'トルーパー' }, { 名前: 'グラシャラボラスC', スタイル: 'カウンター', クラス: 'トルーパー' }, { 名前: 'ブネ', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'ブネB', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'ロノウェ', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'ロノウェR', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'ベリト', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'ベリトB', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'アスタロト', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'アスタロトB', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'フォルネウス', スタイル: 'カウンター', クラス: 'トルーパー' }, { 名前: 'フォルネウスB', スタイル: 'バースト', クラス: 'トルーパー' }, { 名前: 'フォラス', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'フォラスC', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'アスモデウス', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'アスモデウスR', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'ガープ', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'ガープR', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'フルフル', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'フルフルC', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'マルコシアス', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'マルコシアスB', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'ストラス', スタイル: 'バースト', クラス: 'トルーパー' }, { 名前: 'ストラスR', スタイル: 'ラッシュ', クラス: 'トルーパー' }, { 名前: 'フェニックス', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'フェニックスC', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'ハルファス', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'ハルファスR', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'マルファス', スタイル: 'カウンター', クラス: 'トルーパー' }, { 名前: 'マルファスB', スタイル: 'バースト', クラス: 'トルーパー' }, { 名前: 'ラウム', スタイル: 'バースト', クラス: 'トルーパー' }, { 名前: 'ラウムC', スタイル: 'カウンター', クラス: 'トルーパー' }, { 名前: 'フォカロル', スタイル: 'バースト', クラス: 'トルーパー' }, { 名前: 'フォカロルR', スタイル: 'ラッシュ', クラス: 'トルーパー' }, { 名前: 'ウェパル', スタイル: 'ラッシュ', クラス: 'トルーパー' }, { 名前: 'ウェパルB', スタイル: 'バースト', クラス: 'トルーパー' }, { 名前: 'サブナック', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'サブナックB', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'シャックス', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'シャックスB', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'ヴィネ', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'ヴィネR', スタイル: 'ラッシュ', クラス: 'スナイパー' }, { 名前: 'ビフロンス', スタイル: 'ラッシュ', クラス: 'トルーパー' }, { 名前: 'ビフロンスC', スタイル: 'カウンター', クラス: 'トルーパー' }, { 名前: 'ウヴァル', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'ウヴァルC', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'ハーゲンティ', スタイル: 'カウンター', クラス: 'トルーパー' }, { 名前: 'ハーゲンティB', スタイル: 'バースト', クラス: 'トルーパー' }, { 名前: 'クロケル', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'クロケルR', スタイル: 'ラッシュ', クラス: 'スナイパー' }, { 名前: 'フルカス', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'フルカスC', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'バラム', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'バラムR', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'アロケル', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'アロケルR', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'カイム', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'カイムB', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'ムルムル', スタイル: 'ラッシュ', クラス: 'スナイパー' }, { 名前: 'ムルムルC', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'オロバス', スタイル: 'ラッシュ', クラス: 'スナイパー' }, { 名前: 'オロバスC', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'グレモリー', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'グレモリーR', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'オセ', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'オセC', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'アミー', スタイル: 'バースト', クラス: 'トルーパー' }, { 名前: 'アミーC', スタイル: 'カウンター', クラス: 'トルーパー' }, { 名前: 'オリアス', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'オリアスC', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'ウァプラ', スタイル: 'バースト', クラス: 'トルーパー' }, { 名前: 'ウァプラR', スタイル: 'ラッシュ', クラス: 'トルーパー' }, { 名前: 'ザガン', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'ザガンR', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'ウァラク', スタイル: 'バースト', クラス: 'トルーパー' }, { 名前: 'ウァラクC', スタイル: 'カウンター', クラス: 'トルーパー' }, { 名前: 'アンドラス', スタイル: 'ラッシュ', クラス: 'トルーパー' }, { 名前: 'アンドラスC', スタイル: 'カウンター', クラス: 'トルーパー' }, { 名前: 'フラウロス', スタイル: 'ラッシュ', クラス: 'トルーパー' }, { 名前: 'フラウロスB', スタイル: 'バースト', クラス: 'トルーパー' }, { 名前: 'アンドレアルフス', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'アンドレアルフスC', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'キマリス', スタイル: 'ラッシュ', クラス: 'トルーパー' }, { 名前: 'キマリスC', スタイル: 'カウンター', クラス: 'トルーパー' }, { 名前: 'アムドゥスキアス', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'アムドゥスキアスB', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'ベリアル', スタイル: 'ラッシュ', クラス: 'スナイパー' }, { 名前: 'ベリアルB', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'デカラビア', スタイル: 'ラッシュ', クラス: 'スナイパー' }, { 名前: 'デカラビアB', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'セーレ', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'セーレR', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'ダンタリオン', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'ダンタリオンR', スタイル: 'ラッシュ', クラス: 'スナイパー' }, { 名前: 'アンドロマリウス', スタイル: 'ラッシュ', クラス: 'スナイパー' }, { 名前: 'アンドロマリウスC', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'リリム', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'リリムR', スタイル: 'ラッシュ', クラス: 'スナイパー' }, { 名前: 'ニバス', スタイル: 'ラッシュ', クラス: 'スナイパー' }, { 名前: 'ニバスB', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'サキュバス', スタイル: 'ラッシュ', クラス: 'トルーパー' }, { 名前: 'サキュバスB', スタイル: 'バースト', クラス: 'トルーパー' }, { 名前: 'ユフィール', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'ユフィールC', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'フリアエ', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'フリアエR', スタイル: 'ラッシュ', クラス: 'スナイパー' }, { 名前: 'アラストール', スタイル: 'カウンター', クラス: 'トルーパー' }, { 名前: 'アラストールB', スタイル: 'バースト', クラス: 'トルーパー' }, { 名前: 'ヒュトギン', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'ヒュトギンC', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'ロキ', スタイル: 'カウンター', クラス: 'トルーパー' }, { 名前: 'ロキR', スタイル: 'ラッシュ', クラス: 'トルーパー' }, { 名前: 'インキュバス', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'インキュバスC', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'グリマルキン', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'グリマルキンR', スタイル: 'ラッシュ', クラス: 'スナイパー' }, { 名前: 'コルソン', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'コルソンR', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'ジニマル', スタイル: 'カウンター', クラス: 'トルーパー' }, { 名前: 'ジニマルR', スタイル: 'ラッシュ', クラス: 'トルーパー' }, { 名前: 'バフォメット', スタイル: 'ラッシュ', クラス: 'スナイパー' }, { 名前: 'サラ', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'サラB', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'サタナキア', スタイル: 'ラッシュ', クラス: 'スナイパー' }, { 名前: 'サタナキアB', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'タナトス', スタイル: 'カウンター', クラス: 'トルーパー' }, { 名前: 'ティアマト', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'ティアマトR', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'ブニ', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'ブニB', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'オリエンス', スタイル: 'ラッシュ', クラス: 'スナイパー' }, { 名前: 'オリエンスB', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'アリオク', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'リヴァイアサン', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'カスピエル', スタイル: 'バースト', クラス: 'トルーパー' }, { 名前: 'カスピエルC', スタイル: 'カウンター', クラス: 'トルーパー' }, { 名前: 'ネフィリム', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'ネフィリムB', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'ミノソン', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'ニスロク', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'ニスロクB', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'オレイ', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'マルチネ', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'マルチネC', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'アザゼル', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'アルマロス', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'バラキエル', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'フルーレティ', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'フルーレティB', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'ガギゾン', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'ハック', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'ハックB', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'マスティマ', スタイル: 'カウンター', クラス: 'トルーパー' }, { 名前: 'ブリフォー', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'メフィスト', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'メフィストC', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'ネビロス', スタイル: 'ラッシュ', クラス: 'スナイパー' }, { 名前: 'アガリアレプト', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'アガリアレプトR', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'ウコバク', スタイル: 'バースト', クラス: 'トルーパー' }, { 名前: 'グザファン', スタイル: 'ラッシュ', クラス: 'スナイパー' }, { 名前: 'アマイモン', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'アマイモンR', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'ルキフゲス', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'サルガタナス', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'タムス', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'チェルノボグ', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'アガシオン', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'ヴェルドレ', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'ウトゥック', スタイル: 'ラッシュ', クラス: 'スナイパー' }, { 名前: 'サタナイル', スタイル: 'バースト', クラス: 'トルーパー' }, { 名前: 'シャミハザ', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'シャミハザR', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'プルフラス', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'プルフラスB', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'ジズ', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'ジズR', スタイル: 'ラッシュ', クラス: 'スナイパー' }, { 名前: 'ベバル', スタイル: 'バースト', クラス: 'トルーパー' }, { 名前: 'ベバルC', スタイル: 'カウンター', クラス: 'トルーパー' }, { 名前: 'アバラム', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'アバラムC', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'アリトン', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'バロール', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'ベヒモス', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'ベヒモスB', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'ダゴン', スタイル: 'カウンター', クラス: 'トルーパー' }, { 名前: 'ダゴンR', スタイル: 'ラッシュ', クラス: 'トルーパー' }, { 名前: 'スコルベノト', スタイル: 'カウンター', クラス: 'トルーパー' }, { 名前: 'スコルベノトR', スタイル: 'ラッシュ', クラス: 'トルーパー' }, { 名前: 'メルコム', スタイル: 'カウンター', クラス: 'トルーパー' }, { 名前: 'フィロタヌス', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'インプ', スタイル: 'バースト', クラス: 'トルーパー' }, { 名前: 'インプR', スタイル: 'ラッシュ', クラス: 'トルーパー' }, { 名前: 'アマゼロト', スタイル: 'ラッシュ', クラス: 'トルーパー' }, { 名前: 'アマゼロトB', スタイル: 'バースト', クラス: 'トルーパー' }, { 名前: 'プロメテウス', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'プロメテウスC', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'ベルフェゴール', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'マモン', スタイル: 'ラッシュ', クラス: 'スナイパー' }, { 名前: 'ルシファー', スタイル: 'ラッシュ', クラス: 'ファイター' }, { 名前: 'ネルガル', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'ネルガルB', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'バールゼフォン', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'バールゼフォンC', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'アスラフィル', スタイル: 'ラッシュ', クラス: 'トルーパー' }, { 名前: 'アクィエル', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'アクィエルB', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'ゲイボルグ', スタイル: 'ラッシュ', クラス: 'トルーパー' }, { 名前: 'カガセオ', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'マナナンガル', スタイル: 'カウンター', クラス: 'トルーパー' }, { 名前: 'シェンウー', スタイル: 'カウンター', クラス: 'トルーパー' }, { 名前: 'チンロン', スタイル: 'カウンター', クラス: 'トルーパー' }, { 名前: 'バイフー', スタイル: 'バースト', クラス: 'トルーパー' }, { 名前: 'チューチャオ', スタイル: 'ラッシュ', クラス: 'スナイパー' }, { 名前: 'チユエン', スタイル: 'ラッシュ', クラス: 'トルーパー' }, { 名前: 'ヴリトラ', スタイル: 'カウンター', クラス: 'トルーパー' }, { 名前: 'フーリーチン', スタイル: 'カウンター', クラス: 'スナイパー' }, { 名前: 'アンダカ', スタイル: 'カウンター', クラス: 'トルーパー' }, { 名前: 'リリス', スタイル: 'バースト', クラス: 'スナイパー' }, { 名前: 'バールベリト', スタイル: 'カウンター', クラス: 'トルーパー' }, { 名前: 'エウリノーム', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'ベルゼブフ', スタイル: 'カウンター', クラス: 'ファイター' }, { 名前: 'サタン', スタイル: 'バースト', クラス: 'ファイター' }, { 名前: 'モレク', スタイル: 'バースト', クラス: 'ファイター' }];
+            const MEGIDO_LIST = [
+                { 名前: 'バエル', スタイル: 'バースト', クラス: 'スナイパー' },
+                { 名前: 'バエルC', スタイル: 'カウンター', クラス: 'スナイパー' },
+                { 名前: 'アガレス', スタイル: 'バースト', クラス: 'スナイパー' },
+                { 名前: 'ヴァサゴ', スタイル: 'ラッシュ', クラス: 'ファイター' },
+                { 名前: 'ガミジン', スタイル: 'カウンター', クラス: 'ファイター' },
+                { 名前: 'マルバス', スタイル: 'カウンター', クラス: 'スナイパー' },
+                { 名前: 'アモン', スタイル: 'バースト', クラス: 'ファイター' },
+                { 名前: 'バルバトス', スタイル: 'カウンター', クラス: 'スナイパー' },
+                { 名前: 'パイモン', スタイル: 'ラッシュ', クラス: 'ファイター' },
+                { 名前: 'ブエル', スタイル: 'バースト', クラス: 'スナイパー' },
+                { 名前: 'シトリー', スタイル: 'カウンター', クラス: 'トルーパー' },
+                { 名前: 'ベレト', スタイル: 'カウンター', クラス: 'トルーパー' }
+            ];
+            
             const FONT_SIZES = { '強調': 28, '普通': 24, '補足': 20 };
             const STYLE_COLORS = { 'ラッシュ': '#B3B3B5', 'カウンター': '#F36C21', 'バースト': '#5BC0DE' };
-
             const COLOR_PALETTE = {
-                '強化': '#FF0000',
-                '補助': '#0000FF',
-                '状態異常': '#8A2BE2',
-                '弱体': '#FF4500',
-                '妨害': '#FF1493',
-                '回復': '#00FF00',
-                '特殊状態': '#FFD700',
-                'トランス': '#00CED1',
-                '地形': '#A52A2A',
-                '攻撃': '#FF8C00',
-                'その他': '#808080'
+                '強化': '#FF0000', '補助': '#0000FF', '状態異常': '#8A2BE2', '弱体': '#FF4500',
+                '妨害': '#FF1493', '回復': '#00FF00', '特殊状態': '#FFD700', 'トランス': '#00CED1',
+                '地形': '#A52A2A', '攻撃': '#FF8C00', 'その他': '#808080'
+            };
+            const ARROW_COLOR_PALETTE = {
+                'デフォルト': '#0072BC', '強化': '#FF0000', '補助': '#0000FF', '状態異常': '#8A2BE2',
+                '弱体': '#FF4500', '妨害': '#FF1493', '回復': '#00FF00', '特殊状態': '#FFD700',
+                'トランス': '#00CED1', '地形': '#A52A2A', '攻撃': '#FF8C00', 'その他': '#808080'
             };
 
-            const COLOR_NAMES = Object.keys(COLOR_PALETTE);
-
-            
             const canvasRef = useRef(null);
             const imageCache = useRef({});
-
             const [characters, setCharacters] = useState(() => Array(5).fill(null));
             const [groups, setGroups] = useState([]);
             const [arrows, setArrows] = useState([]);
             const [selectedItem, setSelectedItem] = useState(null);
 
-            // --- レイアウト計算 ---
             const getCharacterLayout = useCallback(() => {
                 const charSize = { width: 180, height: 180 };
                 const slotWidth = CANVAS_WIDTH / 5;
@@ -178,6 +176,29 @@
                 characters.forEach(c => { if (c) loadImage(c.名前); });
             }, [characters]);
 
+            const drawCharacterName = (ctx, char, layout) => {
+                const text = char.名前;
+                const fontSize = 16;
+                ctx.font = `900 ${fontSize}px 'Noto Sans JP'`;
+                const textMetrics = ctx.measureText(text);
+                const padding = 8;
+                const labelWidth = textMetrics.width + padding * 2;
+                const labelHeight = fontSize + padding;
+                const labelX = layout.x + (layout.width - labelWidth) / 2;
+                const labelY = layout.y + layout.height + 5;
+
+                const styleColor = STYLE_COLORS[char.スタイル] || '#000000';
+                ctx.fillStyle = styleColor + '80';
+                ctx.fillRect(labelX, labelY, labelWidth, labelHeight);
+                ctx.strokeStyle = styleColor;
+                ctx.lineWidth = 2;
+                ctx.strokeRect(labelX, labelY, labelWidth, labelHeight);
+                ctx.fillStyle = '#FFFFFF';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(text, labelX + labelWidth / 2, labelY + labelHeight / 2);
+            };
+
             const draw = useCallback(() => {
                 const canvas = canvasRef.current;
                 if (!canvas) return;
@@ -189,13 +210,16 @@
                     ctx.drawImage(bgImg, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
                 } else {
                     const gradient = ctx.createLinearGradient(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-                    gradient.addColorStop(0, '#1a1a2e'); gradient.addColorStop(1, '#0f3460');
+                    gradient.addColorStop(0, '#1a1a2e'); 
+                    gradient.addColorStop(1, '#0f3460');
                     ctx.fillStyle = gradient;
                     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
                 }
 
                 const layout = getCharacterLayout();
+                const groupLabelsToRender = [];
 
+                // グループ枠を描画
                 groups.forEach(group => {
                     const members = group.members.map(i => ({...characters[i], layout: layout[i]})).filter(c => c.名前);
                     if (members.length === 0) return;
@@ -208,24 +232,25 @@
                     const padding = 20;
                     const rect = { x: minX - padding, y: minY - padding, width: maxX - minX + 2 * padding, height: maxY - minY + 2 * padding };
 
-                    ctx.fillStyle = group.color;
+                    ctx.fillStyle = group.color + '80';
                     ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
                     
                     ctx.font = `900 ${FONT_SIZES[group.fontSize]}px 'Noto Sans JP'`;
                     const textMetrics = ctx.measureText(group.text);
                     const labelHeight = FONT_SIZES[group.fontSize] + 10;
-                    ctx.fillRect(rect.x, rect.y - labelHeight, textMetrics.width + 20, labelHeight);
+                    const labelWidth = textMetrics.width + 20;
                     
-                    ctx.fillStyle = '#000000';
-                    ctx.textAlign = 'left';
-                    ctx.textBaseline = 'top';
-                    ctx.fillText(group.text, rect.x + 10, rect.y - labelHeight + 5);
+                    groupLabelsToRender.push({
+                        group,
+                        rect: { x: rect.x, y: rect.y - labelHeight, width: labelWidth, height: labelHeight },
+                        fontSize: FONT_SIZES[group.fontSize]
+                    });
                 });
 
+                // キャラクターを描画
                 characters.forEach((char, i) => {
                     if (!char) return;
                     const { x, y, width, height } = layout[i];
-
                     const styleColor = STYLE_COLORS[char.スタイル] || '#000000';
                     ctx.fillStyle = styleColor + 'B3';
                     ctx.strokeStyle = styleColor;
@@ -237,15 +262,18 @@
                     if (img && img.complete && img.naturalWidth > 0) {
                         ctx.drawImage(img, x, y, width, height);
                     }
+                    drawCharacterName(ctx, char, layout[i]);
                 });
                 
+                // 矢印を描画
                 arrows.forEach(arrow => {
                     const getAnchor = (point, isStart) => {
                         const { type, id } = point;
                         if (type === 'enemy') return { x: CANVAS_WIDTH / 2, y: 0 };
                         if (type === 'character') {
                             const charLayout = layout[id];
-                            const y = (isStart && arrow.end.type === 'enemy') ? charLayout.y : charLayout.y + charLayout.height;
+                            const nameOffset = 29;
+                            const y = (isStart && arrow.end.type === 'enemy') ? charLayout.y : charLayout.y + charLayout.height + nameOffset;
                             return { x: charLayout.x + charLayout.width / 2, y: y };
                         }
                         if (type === 'group') {
@@ -255,7 +283,7 @@
                             const minX = Math.min(...members.map(l => l.x));
                             const maxX = Math.max(...members.map(l => l.x + l.width));
                             const maxY = Math.max(...members.map(l => l.y + l.height));
-                            return { x: (minX + maxX) / 2, y: maxY + 20 };
+                            return { x: (minX + maxX) / 2, y: maxY + 49 };
                         }
                         return null;
                     };
@@ -264,16 +292,38 @@
                     const endPos = getAnchor(arrow.end, false);
                     if (!startPos || !endPos) return;
 
-                    const yOffset = Math.max(startPos.y, endPos.y) + 80 + (arrow.offsetY || 0);
-                    const points = [ startPos, { x: startPos.x, y: yOffset }, { x: endPos.x, y: yOffset }, endPos ];
-                    if (arrow.end.type === 'enemy') { points[3] = { x: endPos.x, y: 0 }; }
+                    const arrowColor = arrow.color || ARROW_COLOR_PALETTE['デフォルト'];
+                    let points;
                     
-                    const arrowColor = '#0072BC';
+                    const existingArrows = arrows.filter(a => a.id !== arrow.id);
+                    let yOffset = Math.max(startPos.y, endPos.y) + 80;
+                    
+                    existingArrows.forEach(existingArrow => {
+                        const existingStart = getAnchor(existingArrow.start, true);
+                        const existingEnd = getAnchor(existingArrow.end, false);
+                        if (existingStart && existingEnd && existingArrow.end.type !== 'enemy') {
+                            const existingYOffset = Math.max(existingStart.y, existingEnd.y) + 80 + (existingArrow.offsetY || 0);
+                            if (Math.abs(existingYOffset - yOffset) < 40) {
+                                yOffset += 40;
+                            }
+                        }
+                    });
+                    
+                    if (arrow.end.type === 'enemy') {
+                        const startY = startPos.y;
+                        const midY1 = startY - 50;
+                        const midY2 = 50;
+                        const finalY = 0;
+                        points = [startPos, { x: startPos.x, y: midY1 }, { x: CANVAS_WIDTH / 2, y: midY1 }, { x: CANVAS_WIDTH / 2, y: midY2 }, { x: CANVAS_WIDTH / 2, y: finalY }];
+                    } else {
+                        yOffset += (arrow.offsetY || 0);
+                        points = [startPos, { x: startPos.x, y: yOffset }, { x: endPos.x, y: yOffset }, endPos];
+                    }
+                    
                     const last = points[points.length - 1];
                     const secondLast = points[points.length - 2];
                     const angle = Math.atan2(last.y - secondLast.y, last.x - secondLast.x);
-                    
-                    const lineEndOffset = 10;
+                    const lineEndOffset = 15;
                     const lineEndPoint = {
                         x: last.x - lineEndOffset * Math.cos(angle),
                         y: last.y - lineEndOffset * Math.sin(angle)
@@ -285,8 +335,9 @@
                     ctx.lineCap = 'butt';
                     ctx.beginPath();
                     ctx.moveTo(points[0].x, points[0].y);
-                    ctx.lineTo(points[1].x, points[1].y);
-                    ctx.lineTo(points[2].x, points[2].y);
+                    for (let i = 1; i < points.length - 1; i++) {
+                        ctx.lineTo(points[i].x, points[i].y);
+                    }
                     ctx.lineTo(lineEndPoint.x, lineEndPoint.y);
                     ctx.stroke();
 
@@ -299,22 +350,39 @@
                     ctx.closePath();
                     ctx.fill();
 
-                    const textPos = { x: (startPos.x + endPos.x) / 2, y: yOffset + 30 }; // テキストを下にずらす
+                    const textPos = arrow.end.type === 'enemy' 
+                        ? { x: CANVAS_WIDTH / 2 + 50, y: 80 }
+                        : { x: (startPos.x + endPos.x) / 2, y: yOffset + 30 };
+                    
                     ctx.font = `900 ${FONT_SIZES[arrow.fontSize]}px 'Noto Sans JP'`;
                     const textMetrics = ctx.measureText(arrow.text);
                     const labelHeight = FONT_SIZES[arrow.fontSize] + 10;
                     const labelWidth = textMetrics.width + 20;
 
-                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillStyle = arrowColor + '80';
                     ctx.fillRect(textPos.x - labelWidth / 2, textPos.y, labelWidth, labelHeight);
-                    ctx.strokeStyle = '#000000';
+                    ctx.strokeStyle = arrowColor;
                     ctx.lineWidth = 2;
                     ctx.strokeRect(textPos.x - labelWidth / 2, textPos.y, labelWidth, labelHeight);
-                    
-                    ctx.fillStyle = '#000000';
+                    ctx.fillStyle = '#FFFFFF';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'top';
                     ctx.fillText(arrow.text, textPos.x, textPos.y + 5);
+                });
+
+                // グループ名を最上層に描画
+                groupLabelsToRender.forEach(({ group, rect, fontSize }) => {
+                    ctx.fillStyle = group.color + '80';
+                    ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+                    ctx.strokeStyle = group.color;
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+                    
+                    ctx.font = `900 ${fontSize}px 'Noto Sans JP'`;
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.textAlign = 'left';
+                    ctx.textBaseline = 'top';
+                    ctx.fillText(group.text, rect.x + 10, rect.y + 5);
                 });
             }, [characters, groups, arrows, getCharacterLayout]);
 
@@ -331,7 +399,7 @@
             const addItem = (type) => {
                 const newItem = type === 'group'
                     ? { id: `g_${Date.now()}`, members: [], text: '新規グループ', color: '#FFFF00', fontSize: '普通' }
-                    : { id: `a_${Date.now()}`, text: '新規テキスト', fontSize: '普通', offsetY: 0,
+                    : { id: `a_${Date.now()}`, text: '新規テキスト', fontSize: '普通', offsetY: 0, color: ARROW_COLOR_PALETTE['デフォルト'],
                         start: { type: 'character', id: 0 }, end: { type: 'character', id: 1 } };
                 const setter = type === 'group' ? setGroups : setArrows;
                 setter(p => [...p, newItem]);
@@ -359,109 +427,165 @@
                 setSelectedItem(null);
             };
 
-            const exportImage = () => { setTimeout(() => { const a = document.createElement('a'); a.href = canvasRef.current.toDataURL('image/png'); a.download = 'formation.png'; a.click(); }, 100); };
+            const exportImage = () => { 
+                setTimeout(() => { 
+                    const a = document.createElement('a'); 
+                    a.href = canvasRef.current.toDataURL('image/png'); 
+                    a.download = 'formation.png'; 
+                    a.click(); 
+                }, 100); 
+            };
             
             const currentItem = selectedItem ? (selectedItem.type === 'group' ? groups : arrows).find(i => i.id === selectedItem.id) : null;
 
-            return (
-                <div className="main-container">
-                    <div className="sidebar">
-                        <div className="control-group">
-                            <h3>全体設定</h3>
-                            <button onClick={exportImage} style={{width: '100%'}}>画像を保存</button>
-                        </div>
-
-                        <div className="control-group">
-                            <h3>キャラクター配置</h3>
-                            {Array(5).fill(0).map((_, i) => (
-                                <div key={i} style={{marginBottom: '15px'}}>
-                                    <label>スロット {i+1}</label>
-                                    <div className="char-selector">
-                                        <select value={characters[i]?.名前 || "---"} onChange={e => updateCharacter(i, e.target.value)}>
-                                            <option value="---">（空）</option>
-                                            {MEGIDO_LIST.map(m => <option key={m.名前} value={m.名前}>{m.名前}</option>)}
-                                        </select>
-                                        <img className="char-preview" src={characters[i] ? `./メギド/${encodeURIComponent(characters[i].名前)}.png` : ''} />
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-
-                        <div className="control-group">
-                            <h3>グループ <button className="button-sm" onClick={() => addItem('group')}>+</button></h3>
-                            <div className="item-list">
-                                {groups.map(g => <div key={g.id} className={`item-entry ${selectedItem?.id === g.id ? 'selected' : ''}`} onClick={() => setSelectedItem({type: 'group', id: g.id})}>{g.text}</div>)}
-                            </div>
-                        </div>
-
-                        <div className="control-group">
-                            <h3>矢印 <button className="button-sm" onClick={() => addItem('arrow')}>+</button></h3>
-                            <div className="item-list">
-                                {arrows.map(a => <div key={a.id} className={`item-entry ${selectedItem?.id === a.id ? 'selected' : ''}`} onClick={() => setSelectedItem({type: 'arrow', id: a.id})}>{a.text}</div>)}
-                            </div>
-                        </div>
-
-                        {currentItem && (
-                            <div className="control-group">
-                                <h3>「{currentItem.text}」を編集</h3>
-                                <label>テキスト</label>
-                                <input type="text" value={currentItem.text} onChange={e => updateSelectedItem('text', e.target.value)} />
-                                <label>フォントサイズ</label>
-                                <select value={currentItem.fontSize} onChange={e => updateSelectedItem('fontSize', e.target.value)}>
-                                    {Object.keys(FONT_SIZES).map(key => <option key={key} value={key}>{key}</option>)}
-                                </select>
-                                
-                                {selectedItem.type === 'group' && <>
-                                    <label>色</label>
-                                    <select value={Object.keys(COLOR_PALETTE).find(k => COLOR_PALETTE[k] === currentItem.color)} onChange={e => updateSelectedItem('color', COLOR_PALETTE[e.target.value])}>
-                                        {Object.keys(COLOR_PALETTE).map(key => <option key={key} value={key}>{key}</option>)}
-                                    </select>
-                                    <label>所属キャラ</label>
-                                    <div className="checkbox-grid">
-                                        {characters.map((c, i) => c && (
-                                            <label key={i} className="checkbox-item">
-                                                <input type="checkbox" checked={currentItem.members.includes(i)} onChange={e => {
-                                                    const newMembers = e.target.checked ? [...currentItem.members, i] : currentItem.members.filter(m => m !== i);
-                                                    updateSelectedItem('members', newMembers.sort());
-                                                }}/> {c.名前}
-                                            </label>
-                                        ))}
-                                    </div>
-                                </>}
-
-                                {selectedItem.type === 'arrow' && <>
-                                    <label>開始点</label>
-                                    <select value={`${currentItem.start.type}_${currentItem.start.id}`} onChange={e => updateArrowEndpoint('start', e.target.value)}>
-                                        <optgroup label="キャラクター">
-                                            {characters.map((c, i) => c && <option key={`c_${i}`} value={`character_${i}`}>{c.名前}</option>)}
-                                        </optgroup>
-                                        <optgroup label="グループ">
-                                            {groups.map(g => <option key={`g_${g.id}`} value={`group_${g.id}`}>{g.text}</option>)}
-                                        </optgroup>
-                                    </select>
-                                    <label>終了点</label>
-                                    <select value={`${currentItem.end.type}_${currentItem.end.id}`} onChange={e => updateArrowEndpoint('end', e.target.value)}>
-                                        <optgroup label="キャラクター">
-                                            {characters.map((c, i) => c && <option key={`c_${i}`} value={`character_${i}`}>{c.名前}</option>)}
-                                        </optgroup>
-                                        <option value="enemy_null">敵</option>
-                                    </select>
-                                    <label>Yオフセット (重なり調整用)</label>
-                                    <input type="number" step="10" value={currentItem.offsetY || 0} onChange={e => updateSelectedItem('offsetY', parseInt(e.target.value, 10))} />
-                                </>}
-                                
-                                <button className="button-danger" onClick={deleteSelectedItem} style={{marginTop: '15px', width: '100%'}}>削除</button>
-                            </div>
-                        )}
-                    </div>
-                    <div className="main-content">
-                        <canvas ref={canvasRef} width={CANVAS_WIDTH} height={CANVAS_HEIGHT}></canvas>
-                    </div>
-                </div>
+            return React.createElement('div', { className: 'main-container' },
+                React.createElement('div', { className: 'sidebar' },
+                    React.createElement('div', { className: 'control-group' },
+                        React.createElement('h3', null, '全体設定'),
+                        React.createElement('button', { onClick: exportImage, style: {width: '100%'} }, '画像を保存')
+                    ),
+                    React.createElement('div', { className: 'control-group' },
+                        React.createElement('h3', null, 'キャラクター配置'),
+                        ...Array(5).fill(0).map((_, i) =>
+                            React.createElement('div', { key: i, style: {marginBottom: '15px'} },
+                                React.createElement('label', null, `スロット ${i+1}`),
+                                React.createElement('div', { className: 'char-selector' },
+                                    React.createElement('select', { 
+                                        value: characters[i]?.名前 || "---", 
+                                        onChange: e => updateCharacter(i, e.target.value) 
+                                    },
+                                        React.createElement('option', { value: "---" }, '（空）'),
+                                        ...MEGIDO_LIST.map(m => React.createElement('option', { key: m.名前, value: m.名前 }, m.名前))
+                                    ),
+                                    React.createElement('img', { 
+                                        className: 'char-preview', 
+                                        src: characters[i] ? `./メギド/${encodeURIComponent(characters[i].名前)}.png` : '', 
+                                        alt: ''
+                                    })
+                                )
+                            )
+                        )
+                    ),
+                    React.createElement('div', { className: 'control-group' },
+                        React.createElement('h3', null, 
+                            'グループ ',
+                            React.createElement('button', { className: 'button-sm', onClick: () => addItem('group') }, '+')
+                        ),
+                        React.createElement('div', { className: 'item-list' },
+                            ...groups.map(g => React.createElement('div', { 
+                                key: g.id, 
+                                className: `item-entry ${selectedItem?.id === g.id ? 'selected' : ''}`,
+                                onClick: () => setSelectedItem({type: 'group', id: g.id})
+                            }, g.text))
+                        )
+                    ),
+                    React.createElement('div', { className: 'control-group' },
+                        React.createElement('h3', null, 
+                            '矢印 ',
+                            React.createElement('button', { className: 'button-sm', onClick: () => addItem('arrow') }, '+')
+                        ),
+                        React.createElement('div', { className: 'item-list' },
+                            ...arrows.map(a => React.createElement('div', { 
+                                key: a.id, 
+                                className: `item-entry ${selectedItem?.id === a.id ? 'selected' : ''}`,
+                                onClick: () => setSelectedItem({type: 'arrow', id: a.id})
+                            }, a.text))
+                        )
+                    ),
+                    currentItem && React.createElement('div', { className: 'control-group' },
+                        React.createElement('h3', null, `「${currentItem.text}」を編集`),
+                        React.createElement('label', null, 'テキスト'),
+                        React.createElement('input', { 
+                            type: 'text', 
+                            value: currentItem.text, 
+                            onChange: e => updateSelectedItem('text', e.target.value) 
+                        }),
+                        React.createElement('label', null, 'フォントサイズ'),
+                        React.createElement('select', { 
+                            value: currentItem.fontSize, 
+                            onChange: e => updateSelectedItem('fontSize', e.target.value) 
+                        },
+                            ...Object.keys(FONT_SIZES).map(key => React.createElement('option', { key, value: key }, key))
+                        ),
+                        selectedItem.type === 'group' && React.createElement(React.Fragment, null,
+                            React.createElement('label', null, '色'),
+                            React.createElement('select', { 
+                                value: Object.keys(COLOR_PALETTE).find(k => COLOR_PALETTE[k] === currentItem.color), 
+                                onChange: e => updateSelectedItem('color', COLOR_PALETTE[e.target.value]) 
+                            },
+                                ...Object.keys(COLOR_PALETTE).map(key => React.createElement('option', { key, value: key }, key))
+                            ),
+                            React.createElement('label', null, '所属キャラ'),
+                            React.createElement('div', { className: 'checkbox-grid' },
+                                ...characters.map((c, i) => c && React.createElement('label', { key: i, className: 'checkbox-item' },
+                                    React.createElement('input', { 
+                                        type: 'checkbox', 
+                                        checked: currentItem.members.includes(i),
+                                        onChange: e => {
+                                            const newMembers = e.target.checked ? [...currentItem.members, i] : currentItem.members.filter(m => m !== i);
+                                            updateSelectedItem('members', newMembers.sort());
+                                        }
+                                    }),
+                                    ` ${c.名前}`
+                                ))
+                            )
+                        ),
+                        selectedItem.type === 'arrow' && React.createElement(React.Fragment, null,
+                            React.createElement('label', null, '色'),
+                            React.createElement('select', { 
+                                value: Object.keys(ARROW_COLOR_PALETTE).find(k => ARROW_COLOR_PALETTE[k] === currentItem.color), 
+                                onChange: e => updateSelectedItem('color', ARROW_COLOR_PALETTE[e.target.value]) 
+                            },
+                                ...Object.keys(ARROW_COLOR_PALETTE).map(key => React.createElement('option', { key, value: key }, key))
+                            ),
+                            React.createElement('label', null, '開始点'),
+                            React.createElement('select', { 
+                                value: `${currentItem.start.type}_${currentItem.start.id}`, 
+                                onChange: e => updateArrowEndpoint('start', e.target.value) 
+                            },
+                                React.createElement('optgroup', { label: 'キャラクター' },
+                                    ...characters.map((c, i) => c && React.createElement('option', { key: `c_${i}`, value: `character_${i}` }, c.名前))
+                                ),
+                                React.createElement('optgroup', { label: 'グループ' },
+                                    ...groups.map(g => React.createElement('option', { key: `g_${g.id}`, value: `group_${g.id}` }, g.text))
+                                )
+                            ),
+                            React.createElement('label', null, '終了点'),
+                            React.createElement('select', { 
+                                value: `${currentItem.end.type}_${currentItem.end.id}`, 
+                                onChange: e => updateArrowEndpoint('end', e.target.value) 
+                            },
+                                React.createElement('optgroup', { label: 'キャラクター' },
+                                    ...characters.map((c, i) => c && React.createElement('option', { key: `c_${i}`, value: `character_${i}` }, c.名前))
+                                ),
+                                React.createElement('option', { value: 'enemy_null' }, '敵')
+                            ),
+                            React.createElement('label', null, 'Yオフセット (重なり調整用)'),
+                            React.createElement('input', { 
+                                type: 'number', 
+                                step: '10', 
+                                value: currentItem.offsetY || 0, 
+                                onChange: e => updateSelectedItem('offsetY', parseInt(e.target.value, 10)) 
+                            })
+                        ),
+                        React.createElement('button', { 
+                            className: 'button-danger', 
+                            onClick: deleteSelectedItem, 
+                            style: {marginTop: '15px', width: '100%'} 
+                        }, '削除')
+                    )
+                ),
+                React.createElement('div', { className: 'main-content' },
+                    React.createElement('canvas', { 
+                        ref: canvasRef, 
+                        width: CANVAS_WIDTH, 
+                        height: CANVAS_HEIGHT 
+                    })
+                )
             );
         }
 
-        ReactDOM.render(<FormationCreator />, document.getElementById('root'));
+        ReactDOM.render(React.createElement(FormationCreator), document.getElementById('root'));
     </script>
 </body>
 </html>
