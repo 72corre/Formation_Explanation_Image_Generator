@@ -149,6 +149,16 @@
         .checkbox-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; }
         .checkbox-item { display: flex; align-items: center; font-size: 12px; }
 
+        .footer {
+            background-color: #f8f9fa;
+            padding: 15px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            border-top: 1px solid #dee2e6;
+            line-height: 1.4;
+        }
+
         @media (max-width: 800px) {
             body { height: auto; }
             .main-container { flex-direction: column; }
@@ -202,6 +212,14 @@
                     ...charSize
                 }));
             }, []);
+
+            // ひらがなをカタカナに変換する関数
+            const hiraganaToKatakana = (str) => {
+                return str.replace(/[\u3041-\u3096]/g, function(match) {
+                    const chr = match.charCodeAt(0) + 0x60;
+                    return String.fromCharCode(chr);
+                });
+            };
 
             const loadImage = (name, isBg = false) => {
                 const src = isBg ? './back.png' : `./メギド/${encodeURIComponent(name)}.png`;
@@ -491,9 +509,14 @@
 
             const getFilteredMegidos = (searchTerm) => {
                 if (!searchTerm) return [];
-                return MEGIDO_LIST.filter(m => 
-                    m.名前.toLowerCase().includes(searchTerm.toLowerCase())
-                ).slice(0, 8); // 最大8件表示
+                
+                const normalizedSearch = searchTerm.toLowerCase();
+                const katakanaSearch = hiraganaToKatakana(normalizedSearch);
+                
+                return MEGIDO_LIST.filter(m => {
+                    const name = m.名前.toLowerCase();
+                    return name.includes(normalizedSearch) || name.includes(katakanaSearch);
+                }).slice(0, 8); // 最大8件表示
             };
 
             const handleInputFocus = (index) => {
@@ -559,9 +582,11 @@
             
             const currentItem = selectedItem ? (selectedItem.type === 'group' ? groups : arrows).find(i => i.id === selectedItem.id) : null;
 
-            return React.createElement('div', { className: 'main-container' },
-                React.createElement('div', { className: 'sidebar' },
+            return React.createElement('div', { style: { display: 'flex', flexDirection: 'column', height: '100vh' } },
+                React.createElement('div', { className: 'main-container' },
+                    React.createElement('div', { className: 'sidebar' },
                     React.createElement('div', { className: 'control-group' },
+                        React.createElement('h3', null, '全体設定'),
                         React.createElement('button', { onClick: exportImage, style: {width: '100%'} }, '画像を保存')
                     ),
                     React.createElement('div', { className: 'control-group' },
@@ -723,6 +748,15 @@
                         height: CANVAS_HEIGHT 
                     })
                 )
+            ),
+            React.createElement('div', { className: 'footer' },
+                React.createElement('div', null, 
+                    '当サイトはメギド72の画像を引用しています。これらの著作権、商標権、その他知的財産権は、株式会社ディー・エヌ・エーおよびメディア・ビジョン株式会社に帰属します。'
+                ),
+                React.createElement('div', null,
+                    '当サイトは個人ファンサイトであり、株式会社ディー・エヌ・エー他企業様とは一切関係ありません。'
+                )
+            )
             );
         }
 
